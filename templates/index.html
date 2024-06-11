@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Chatbot</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            font-weight: 400;
+            font-size: 100%;
+            background: #F1F1F1;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .chatbox {
+            position: relative;
+        }
+
+        .chatbox__support {
+            display: flex;
+            flex-direction: column;
+            background: #eee;
+            width: 600px; /* Increased width */
+            height: 700px; /* Increased height */
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            overflow: hidden; /* Prevents scrollbar from appearing outside */
+        }
+
+        .chatbox__header {
+            background: linear-gradient(93.12deg, #581B98 0.52%, #9C1DE7 100%);
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 20px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
+            color: white;
+        }
+
+        .chatbox__messages {
+            flex: 1;
+            padding: 10px 20px; /* Adjusted padding */
+            overflow-y: auto;
+        }
+
+        .chatbox__footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background: #f9f9f9;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+
+        .chatbox__footer input {
+            flex: 1;
+            border: none;
+            padding: 10px;
+            border-radius: 30px;
+        }
+
+        .chatbox__footer button {
+            padding: 10px;
+            background: #581B98;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+
+        .user-message {
+            background: #007bff;
+            color: white;
+            max-width: 70%;
+            padding: 8px 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            align-self: flex-end;
+        }
+
+        .bot-message {
+            background: #28a745;
+            color: white;
+            max-width: 70%;
+            padding: 8px 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            align-self: flex-start;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="chatbox">
+            <div class="chatbox__support">
+                <div class="chatbox__header">
+                    <div class="chatbox__image--header">
+                        <img src="https://img.icons8.com/color/48/000000/circled-user-female-skin-type-5--v1.png" alt="image">
+                    </div>
+                    <div class="chatbox__content--header">
+                        <h4 class="chatbox__heading--header">Chat support</h4>
+                        <p class="chatbox__description--header">Chatbot using GPT-2</p>
+                    </div>
+                </div>
+                <div class="chatbox__messages" id="messages">
+                    <!-- Messages will appear here -->
+                </div>
+                <div class="chatbox__footer">
+                    <input type="text" id="prompt" placeholder="Write a message...">
+                    <button onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const prompt = document.getElementById('prompt').value;
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML += `<div class="user-message">${prompt}</div>`;
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const responseData = await response.json();
+                messagesDiv.innerHTML += `<div class="bot-message">${responseData.response}</div>`;
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            } catch (error) {
+                console.error('Error:', error);
+                // Handle error appropriately, e.g., display an error message to the user
+            }
+        }
+    </script>
+
+</body>
+
+</html>
